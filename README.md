@@ -15,7 +15,7 @@ npm ci
 npm run dev
 ```
 
-La API escucha en [http://localhost:3000](http://localhost:3000) por defecto. El puerto puede cambiarse mediante la variable de entorno `PORT`. Para detener el servidor, presiona `Ctrl+C`.
+La API escucha en [http://localhost:3000](http://localhost:3000) por defecto. El puerto puede cambiarse mediante la variable de entorno `PORT`.
 
 ## Pruebas y capturas
 
