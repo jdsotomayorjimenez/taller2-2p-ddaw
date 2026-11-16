@@ -13,7 +13,7 @@ const Curso = mongoose.model('Curso', new mongoose.Schema({
 const app = express();
 app.use(express.json());
 
-app.get('/', (_req, res) => res.json({ servicio: 'cursos', estado: 'ok' }));
+app.get('/', (_req, res) => res.json({ servicio: 'cursos', estado: 'funcionando' }));
 
 // Listar cursos
 app.get('/cursos', async (_req, res) => res.json(await Curso.find()));

@@ -1,4 +1,4 @@
-# Orquesta 3 contenedores: base de datos + 2 microservicios
+# Orquesta 4 contenedores: base de datos + 3 microservicios
 services:
   mongodb:
     image: mongo:8
@@ -37,8 +37,15 @@ services:
       - "4000:4000"
     environment:
       CURSOS_URL: http://cursos:3000
+      ESTUDIANTES_URL: http://estudiantes:5000
     depends_on:
       - cursos
+      - estudiantes
+
+  estudiantes:
+    build: ./estudiantes
+    ports:
+      - "5000:5000"
 
 volumes:
   datos-mongo:
