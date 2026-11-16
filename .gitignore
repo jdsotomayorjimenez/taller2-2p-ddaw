@@ -1,3 +1,7 @@
 node_modules/
 npm-debug.log
 .env
+
+# Material de clase y talleres anteriores (no se suben)
+docs/4 - Contenedores 2 - Dockerfile y Compose.pdf
+docs/Taller 1 - 2P - Juan Diego Sotomayor.pdf
