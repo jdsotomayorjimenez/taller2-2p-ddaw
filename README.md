@@ -206,6 +206,24 @@ Al detener estudiantes, `/resumen` responde con un error controlado. Al iniciarl
 - **Persistencia:** los cursos viven en el volumen `datos-mongo` y sobreviven a `docker compose down`. Los estudiantes están en un arreglo en memoria, así que vuelven a los cinco iniciales cada vez que el contenedor se reinicia.
 - **Fallo aislado:** reportes consulta cada servicio en un bloque `try/catch` separado. Si uno no responde, devuelve `503` con un mensaje que indica cuál falló y el resto del sistema sigue funcionando.
 
+## Ticket de salida
+
+### 1. ¿Qué diferencia hay entre RUN y CMD en un Dockerfile?
+
+`RUN` se ejecuta durante `docker build`, cuando se construye la imagen. Se usa para instalar dependencias o compilar, como `RUN npm install --omit=dev`, y su resultado queda guardado como una capa de la imagen. `CMD` se ejecuta durante `docker run`, al iniciar el contenedor, e indica el comando que arranca la aplicación, como `CMD ["node", "index.js"]`. Un Dockerfile puede tener varios `RUN`, pero solo vale el último `CMD`.
+
+### 2. ¿Por qué copiamos package.json antes que el resto del código?
+
+Por la caché de capas. Cada instrucción del Dockerfile crea una capa, y Docker reutiliza las capas que no cambiaron hasta encontrar el primer cambio. Si se copia primero solo `package*.json` y después se ejecuta `npm install`, esa capa queda en caché. Cuando solo cambia el código, por ejemplo `index.js`, únicamente se rehace el `COPY . .` y la instalación de dependencias no se repite. Así el build es mucho más rápido. `npm install` solo vuelve a ejecutarse si cambian las dependencias.
+
+### 3. ¿Por qué el servicio cursos usa «mongodb» y no «localhost» para conectarse?
+
+Dentro de un contenedor, `localhost` apunta al propio contenedor y no a la computadora ni a otros contenedores. Por eso, si cursos buscara la base en `localhost:27017`, no la encontraría y fallaría con `MongooseServerSelectionError`. En una red definida por el usuario, como `red-academia`, o en la red que crea Docker Compose, Docker resuelve el nombre del contenedor o del servicio como si fuera un dominio. Por eso la URL usa `mongodb:27017`.
+
+### 4. ¿Qué demostró el experimento de detener el servicio cursos?
+
+Demostró que en microservicios los fallos quedan aislados. Al detener cursos con `docker compose stop cursos`, reportes siguió funcionando: `localhost:4000` respondía `{"servicio":"reportes","estado":"ok"}` y `/resumen` devolvía un error controlado (503, "El servicio de cursos no responde") en vez de caerse. Al volver a iniciar cursos, todo funcionó otra vez sin reiniciar reportes. En un monolito, un error grave en un módulo puede tumbar toda la aplicación. Aquí solo se degradó una función.
+
 ## Estructura
 
 ```text
